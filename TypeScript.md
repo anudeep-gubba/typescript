@@ -26,7 +26,6 @@ TypeScript is an **object-oriented, open-source programming language** developed
 
 - **JavaScript is dynamic** and lacks a type system, which can make large-scale development challenging.
 - TypeScript offers a **type system** that:
-
   - Enhances **code quality** and **readability**
   - Makes code **easier to refactor**
   - **Identifies errors during compile time**, not at runtime
@@ -93,8 +92,7 @@ function add(x: number, y: number) {
 }
 ```
 
-TypeScript catches type errors before code runs.
----
+## TypeScript catches type errors before code runs.
 
 # **TypeScript Setup**
 
@@ -103,20 +101,16 @@ TypeScript catches type errors before code runs.
 To start developing with TypeScript, you need the following:
 
 1. **Node.js**
-
    - Required to run the TypeScript compiler.
    - You don’t need to learn Node.js itself to use it.
 
 2. **TypeScript Compiler (`tsc`)**
-
    - A Node.js module that compiles `.ts` files into `.js`.
 
 3. **Visual Studio Code (VS Code)**
-
    - Recommended code editor with excellent TypeScript support.
 
 4. **Live Server Extension (optional)**
-
    - Provides a local dev server with hot-reloading in VS Code.
 
 ---
@@ -168,10 +162,10 @@ To start developing with TypeScript, you need the following:
 1. Download from the [VS Code website](https://code.visualstudio.com/).
 2. Install and open the editor.
 3. To install **Live Server**:
-
    - Open the Extensions tab.
    - Search for "Live Server".
    - Click **Install**.
+
 ---
 
 # TypeScript “Hello, World!” Tutorial
@@ -258,7 +252,6 @@ This guide walks you through creating a simple **Hello, World!** program in Type
    ```
 
 4. **Run with Live Server**
-
    - Right-click `index.html` > **Open with Live Server**
 
 5. **Make Changes (Example)**
@@ -286,6 +279,89 @@ This guide walks you through creating a simple **Hello, World!** program in Type
 - You learned how to create and run a simple **TypeScript** program in both **Node.js** and **web browsers**.
 - The setup demonstrated how TypeScript files are compiled into JavaScript and executed or rendered.
 - Tools like **Live Server** improve development speed with hot reloading.
+
+Here's a cleaner and easier-to-understand version:
+
+### Configuring the TypeScript Compiler
+
+When you run the TypeScript compiler (`tsc`) in a project without a configuration file, it displays a help message by default.
+
+To configure the compiler, create a **`tsconfig.json`** file. TypeScript can generate one with recommended settings using:
+
+```bash
+npx tsc --init
+```
+
+This creates a `tsconfig.json` file similar to:
+
+```json
+{
+  // Visit https://aka.ms/tsconfig to read more about this file
+  "compilerOptions": {
+    // File Layout
+    // "rootDir": "./src",
+    // "outDir": "./dist",
+
+    // Environment Settings
+    // See also https://aka.ms/tsconfig/module
+    "module": "nodenext",
+    "target": "esnext",
+    "types": [],
+    // For nodejs:
+    // "lib": ["esnext"],
+    // "types": ["node"],
+    // and npm install -D @types/node
+
+    // Other Outputs
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+
+    // Stricter Typechecking Options
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+
+    // Style Options
+    // "noImplicitReturns": true,
+    // "noImplicitOverride": true,
+    // "noUnusedLocals": true,
+    // "noUnusedParameters": true,
+    // "noFallthroughCasesInSwitch": true,
+    // "noPropertyAccessFromIndexSignature": true,
+
+    // Recommended Options
+    "strict": true,
+    "jsx": "react-jsx",
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "noUncheckedSideEffectImports": true,
+    "moduleDetection": "force",
+    "skipLibCheck": true
+  }
+}
+```
+
+### Customizing tsconfig.json
+
+You can modify the configuration file to suit your project needs. For example:
+
+```json
+{
+  "include": ["src/**/*.ts"], // Look for TypeScript files here
+  "exclude": ["build", "node_modules"], // Ignore generated files and dependencies
+
+  // Configuration options that control how TypeScript compiles code
+  "compilerOptions": {
+    "rootDir": "./src", // Folder containing TypeScript source code
+    "outDir": "./build" // Save compiled files to build
+  }
+}
+```
+
+### What This Configuration Does
+
+- **`include: ["src"]`** – Tells TypeScript to compile files only from the `src` directory.
+- **`outDir: "./build"`** – Specifies that the generated JavaScript files should be placed in the `build` directory.
 
 ---
 
@@ -582,17 +658,14 @@ A **data type** in TypeScript defines the kind of value a variable can hold, spe
 ### Categories of Data Types in TypeScript
 
 1. **Primitive Data Types**:
-
    - Basic, indivisible types provided by the language.
    - Examples: `number`, `string`, `boolean`, `null`, `undefined`, `symbol`, `bigint`.
 
 2. **Special TypeScript Types**:
-
    - Unique to TypeScript for enhanced type safety and control.
    - Examples: `any`, `unknown`, `void`, `never`.
 
 3. **Composite Data Types**:
-
    - Complex types that combine or structure data.
    - Examples: `array`, `tuple`, `object`, `enum`, `union`, `intersection`.
 
