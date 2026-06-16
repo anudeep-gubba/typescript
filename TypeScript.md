@@ -94,20 +94,6 @@ function add(x: number, y: number) {
 ```
 
 TypeScript catches type errors before code runs.
-
----
-
-## 📝 **Summary**
-
-- TypeScript is a **typed superset** of JavaScript.
-- It offers **compile-time error checking**, **modern JavaScript features**, and **object-oriented programming constructs**.
-- Ideal for **scalable**, **maintainable**, and **robust** application development.
-- Compiles to plain JavaScript for **broad browser compatibility**.
-
----
-
-Here's a **concise and well-structured summary** of the **TypeScript Setup** tutorial:
-
 ---
 
 # **TypeScript Setup**
