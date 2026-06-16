@@ -172,30 +172,17 @@ To start developing with TypeScript, you need the following:
    - Open the Extensions tab.
    - Search for "Live Server".
    - Click **Install**.
-
 ---
 
-## 📝 **Summary**
-
-- **`tsc`** compiles TypeScript into JavaScript.
-- **`tsx`** allows running TypeScript files directly via Node.js.
-- **VS Code + Live Server** is recommended for a streamlined workflow.
-
----
-
-Here's a **clean and formatted summary** of the **TypeScript “Hello, World!”** tutorial:
-
----
-
-# **TypeScript “Hello, World!” Tutorial **
+# TypeScript “Hello, World!” Tutorial
 
 This guide walks you through creating a simple **Hello, World!** program in TypeScript using both **Node.js** and **web browsers**.
 
 ---
 
-## 👨‍💻 **Hello World in Node.js**
+## 👨‍💻 Hello World in Node.js
 
-### 🔧 **Steps to Run**
+### 🔧 Steps to Run
 
 1. **Create Project Folder**
    Create a directory named `helloworld`.
