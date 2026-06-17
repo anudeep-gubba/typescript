@@ -280,8 +280,6 @@ This guide walks you through creating a simple **Hello, World!** program in Type
 - The setup demonstrated how TypeScript files are compiled into JavaScript and executed or rendered.
 - Tools like **Live Server** improve development speed with hot reloading.
 
-Here's a cleaner and easier-to-understand version:
-
 ### Configuring the TypeScript Compiler
 
 When you run the TypeScript compiler (`tsc`) in a project without a configuration file, it displays a help message by default.
@@ -364,23 +362,587 @@ You can modify the configuration file to suit your project needs. For example:
 - **`outDir: "./build"`** – Specifies that the generated JavaScript files should be placed in the `build` directory.
 
 ---
+# Type Annotations in TypeScript
 
-# **TypeScript Types – Summary**
+## What is a Type Annotation?
 
-## 📌 **What is a Type in TypeScript?**
+* Used to **explicitly define a data type**.
+* Syntax: `identifier: type`
 
-- A **type** is a label that describes the **properties and methods** a value has.
-- **Every value** in TypeScript has a type (e.g., number, string, array, object, function).
-- Types help TypeScript **understand how values behave**, enabling better code suggestions and error checking.
-
-### ✨ Example:
-
-```typescript
-console.log("Hello".length); // Output: 5
-console.log("Hello".toLocaleUpperCase()); // Output: 'HELLO'
+```ts
+let count: number;
+let name: string;
 ```
 
-- `'Hello'` is a **string**, which includes methods like `.length`, `.match()`, `.indexOf()`.
+---
+
+## Variables & Constants
+
+```ts
+let counter: number = 1;
+const PI: number = 3.14;
+```
+
+❌ Invalid:
+
+```ts
+let counter: number;
+counter = "Hello"; // Error
+```
+
+---
+
+## Primitive Types
+
+```ts
+let name: string = "John";
+let age: number = 25;
+let active: boolean = true;
+```
+
+| Type    | Example  |
+| ------- | -------- |
+| string  | `"John"` |
+| number  | `25`     |
+| boolean | `true`   |
+
+---
+
+## Arrays
+
+Syntax:
+
+```ts
+let arrayName: type[];
+```
+
+Example:
+
+```ts
+let names: string[] = ["John", "Jane", "Peter"];
+```
+
+---
+
+## Objects
+
+```ts
+let person: {
+  name: string;
+  age: number;
+};
+
+person = {
+  name: "John",
+  age: 25
+};
+```
+
+✔ Must contain the defined properties and types.
+
+---
+
+## Functions
+
+### Function Type
+
+```ts
+let greeting: (name: string) => string;
+```
+
+### Valid
+
+```ts
+greeting = function(name: string) {
+  return `Hi ${name}`;
+};
+```
+
+### Invalid
+
+```ts
+greeting = function() {
+  console.log("Hello");
+};
+```
+
+❌ Error: Return type `void` doesn't match `string`.
+
+---
+
+## Key Points
+
+* `:` is used to add a type annotation.
+* Prevents assigning incorrect data types.
+* Can be used with:
+
+  * Variables
+  * Constants
+  * Arrays
+  * Objects
+  * Function parameters
+  * Function return values
+
+### Quick Syntax Reference
+
+```ts
+let name: string;
+let age: number;
+let active: boolean;
+
+let names: string[];
+
+let person: {
+  name: string;
+  age: number;
+};
+
+let greet: (name: string) => string;
+```
+
+**Summary:** Type annotations (`: type`) help TypeScript catch type errors at compile time and make code safer and easier to understand.
+
+# TypeScript Type Inference 
+
+## What is Type Inference?
+
+TypeScript automatically **guesses the type** of a variable, parameter, or function return value when you don't explicitly define it.
+
+```ts
+let counter = 0;
+```
+
+TypeScript infers:
+
+```ts
+let counter: number = 0;
+```
+
+---
+
+# Type Inference vs Type Annotation
+
+| Type Inference              | Type Annotation                      |
+| --------------------------- | ------------------------------------ |
+| TypeScript guesses the type | You explicitly define the type       |
+| Less code                   | More readable & strict               |
+| Good for simple variables   | Best for functions & complex objects |
+
+### Inference
+
+```ts
+let name = "John";      // string
+let age = 25;          // number
+let active = true;     // boolean
+```
+
+### Annotation
+
+```ts
+let name: string = "John";
+let age: number = 25;
+let active: boolean = true;
+```
+
+---
+
+# Variable Type Inference
+
+```ts
+let score = 100;
+```
+
+TypeScript infers:
+
+```ts
+let score: number = 100;
+```
+
+❌ Error
+
+```ts
+score = "High";
+```
+
+Because `score` is already inferred as `number`.
+
+---
+
+# Function Parameter Inference
+
+Default values help TypeScript infer types.
+
+```ts
+function setCounter(max = 100) {
+}
+```
+
+TypeScript infers:
+
+```ts
+function setCounter(max: number) {
+}
+```
+
+---
+
+# Function Return Type Inference
+
+```ts
+function increment(counter: number) {
+    return counter++;
+}
+```
+
+TypeScript infers:
+
+```ts
+function increment(counter: number): number
+```
+
+### Best Practice
+
+Explicitly define return types for important functions.
+
+```ts
+function increment(counter: number): number {
+    return counter++;
+}
+```
+
+---
+
+# Best Common Type Algorithm
+
+When multiple values exist, TypeScript finds a common compatible type.
+
+### Example 1
+
+```ts
+let items = [1, 2, 3, null];
+```
+
+Inferred type:
+
+```ts
+(number | null)[]
+```
+
+### Example 2
+
+```ts
+let items = [1, 2, 3, "Cheese"];
+```
+
+Inferred type:
+
+```ts
+(number | string)[]
+```
+
+### Union Type
+
+`|` means **OR**
+
+```ts
+number | string
+```
+
+Value can be either a number or a string.
+
+---
+
+# Contextual Typing
+
+TypeScript uses surrounding code to determine a type.
+
+### Click Event
+
+```ts
+document.addEventListener("click", (event) => {
+    console.log(event.button);
+});
+```
+
+TypeScript knows:
+
+```ts
+event: MouseEvent
+```
+
+### Scroll Event
+
+```ts
+document.addEventListener("scroll", (event) => {
+    console.log(event.button);
+});
+```
+
+❌ Error
+
+Because:
+
+```ts
+event: Event
+```
+
+`Event` doesn't contain the `button` property.
+
+---
+
+# Object Type Inference
+
+```ts
+const user = {
+    name: "Alice",
+    age: 30,
+    isAdmin: true
+};
+```
+
+TypeScript infers:
+
+```ts
+{
+    name: string;
+    age: number;
+    isAdmin: boolean;
+}
+```
+
+Valid:
+
+```ts
+console.log(user.name);
+```
+
+❌ Invalid:
+
+```ts
+console.log(user.email);
+```
+
+---
+
+# Explicit Types (Recommended)
+
+## Function Parameters
+
+```ts
+function greet(name: string): string {
+    return `Hello ${name}`;
+}
+```
+
+## Arrays
+
+```ts
+let scores: number[] = [100, 95, 98];
+```
+
+## Objects
+
+```ts
+const user: {
+    name: string;
+    age: number;
+} = {
+    name: "Alice",
+    age: 30
+};
+```
+
+---
+
+# Type Safety Examples
+
+### Explicit Type Error
+
+```ts
+let username: string = "alice";
+username = 42;
+```
+
+❌ Error
+
+```
+Type 'number' is not assignable to type 'string'
+```
+
+---
+
+### Inferred Type Error
+
+```ts
+let score = 100;
+score = "high";
+```
+
+❌ Error
+
+```
+Type 'string' is not assignable to type 'number'
+```
+
+---
+
+# JavaScript vs TypeScript
+
+### JavaScript
+
+```js
+function add(a, b) {
+    return a + b;
+}
+
+add("5", 3); // "53"
+```
+
+May cause bugs.
+
+### TypeScript
+
+```ts
+function add(a: number, b: number): number {
+    return a + b;
+}
+
+add("5", 3);
+```
+
+❌ Compile-time error.
+
+---
+
+# When TypeScript Cannot Infer Types
+
+## JSON.parse()
+
+```ts
+const data = JSON.parse(jsonString);
+```
+
+Type:
+
+```ts
+any
+```
+
+Because TypeScript doesn't know the structure.
+
+---
+
+## Uninitialized Variables
+
+```ts
+let value;
+```
+
+Type:
+
+```ts
+any
+```
+
+```ts
+value = "Hello";
+value = 100;
+```
+
+No errors because `any` disables type checking.
+
+---
+
+# Avoid `any`
+
+❌ Avoid
+
+```ts
+let data: any;
+```
+
+✅ Prefer
+
+```ts
+let data: string;
+```
+
+or
+
+```ts
+interface User {
+    name: string;
+    age: number;
+}
+```
+
+Also enable:
+
+```json
+{
+  "compilerOptions": {
+    "noImplicitAny": true
+  }
+}
+```
+
+---
+
+# When to Use Type Inference
+
+✅ Simple variables
+
+```ts
+let name = "John";
+let age = 25;
+```
+
+✅ Obvious types
+
+```ts
+const isAdmin = true;
+```
+
+---
+
+# When to Use Explicit Types
+
+✅ Function parameters
+
+```ts
+function greet(name: string)
+```
+
+✅ Function return types
+
+```ts
+function greet(): string
+```
+
+✅ Complex objects
+
+```ts
+const user: User
+```
+
+✅ Variables initialized later
+
+```ts
+let score: number;
+```
+
+---
+
+# Interview Quick Recap
+
+* **Type Inference** → TypeScript automatically determines the type.
+* **Type Annotation** → You explicitly specify the type using `: type`.
+* **Best Common Type** → Finds a compatible type for multiple values.
+* **Contextual Typing** → Infers types from surrounding code.
+* **Union Type (`|`)** → Allows multiple possible types.
+* **`any`** → Disables type checking; avoid when possible.
+* **Use Inference for simple variables.**
+* **Use Explicit Types for functions, APIs, and complex objects.** 🚀
 
 ---
 
