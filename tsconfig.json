@@ -1,0 +1,7 @@
+{
+  "include": ["typescript/*.ts"],
+  "compilerOptions": {
+    "rootDir": "./typescript",
+    "outDir": "./build"
+  }
+}
