@@ -2,6 +2,7 @@
   "include": ["typescript/*.ts"],
   "compilerOptions": {
     "rootDir": "./typescript",
-    "outDir": "./build"
+    "outDir": "./build",
+    "strictNullChecks": true
   }
 }
