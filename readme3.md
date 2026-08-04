@@ -251,6 +251,48 @@ Create Promise → Pending → success === true?
    No  → reject()  → Rejected
 ```
 
+### Important: `resolve` and `reject` Are Optional Parameters
+
+A point that's easy to miss: the executor function `(resolve, reject) => {...}` doesn't _require_ you to accept or use both parameters. They're just regular function parameters — you can:
+
+- Use only `resolve` if the operation can never fail:
+
+```javascript
+const alwaysWorks = new Promise((resolve) => {
+  resolve("Done"); // no reject needed at all
+});
+```
+
+- Omit both entirely if you're not settling the Promise from inside the executor (e.g., you're storing them for later, as we'll see in `Promise.withResolvers()`):
+
+```javascript
+let saveResolve;
+
+const promise = new Promise((resolve) => {
+  saveResolve = resolve; // reject wasn't even declared as a parameter
+});
+```
+
+- Name them anything you like — `resolve`/`reject` are just conventions, not keywords:
+
+```javascript
+const promise = new Promise((yes, no) => {
+  yes("It worked");
+});
+```
+
+**Also worth remembering:** if you call `resolve()` and then later call `reject()` (or call `resolve()` twice), only the **first call wins**. A Promise can settle only once — every call after that is silently ignored.
+
+```javascript
+const promise = new Promise((resolve, reject) => {
+  resolve("First");
+  reject("This is ignored"); // has no effect — already settled
+  resolve("This is also ignored");
+});
+
+promise.then(console.log); // "First"
+```
+
 ---
 
 ## 5. Consuming a Promise: `then()`, `catch()`, `finally()`
@@ -952,6 +994,67 @@ login()
 
 `async`/`await` is **syntactic sugar built on top of Promises** — it lets you write asynchronous code that _reads_ like ordinary synchronous code, while still being non-blocking under the hood.
 
+### The Restaurant Analogy
+
+Think of an `async` function as a **restaurant order-ticket system**. When you order food, the waiter doesn't hand you the food instantly — they hand you a **ticket** (a Promise) that says _"this will become your food."_ `async` is what turns a normal function into one that hands back a ticket instead of the finished result directly.
+
+```javascript
+async function getName() {
+  return "John";
+}
+
+getName(); // NOT "John" — it's Promise {"John"}, the ticket, not the food
+```
+
+To get the food off the ticket, you either **wait** for it (`await`) or attach a **`.then()`** to collect it whenever it's ready.
+
+`await` means: _"Don't move to the next line until this Promise is done — but only inside the function I'm currently in."_ Everything else in the program keeps running normally.
+
+```javascript
+async function order() {
+  console.log("Ordering...");
+  const food = await cookFood(); // pause HERE only
+  console.log("Got:", food);
+}
+
+console.log("Restaurant open");
+order();
+console.log("Doing other stuff while food cooks");
+
+// Output:
+// Restaurant open
+// Ordering...
+// Doing other stuff while food cooks
+// Got: Pizza
+```
+
+Notice `"Doing other stuff"` prints **before** `"Got: Pizza"` — even though the line that logs `"Got:"` sits earlier in the source than the outer `console.log`. This is the detail that trips up most beginners: `await` doesn't freeze the whole app, it only pauses the _next line inside that one function_.
+
+**The mental model that fixes most of the confusion:**
+
+```
+await somePromise
+```
+
+just means _"unwrap this Promise and give me the real value, pausing only this function until it's ready."_ It does exactly what `.then((value) => {...})` does — just written so it reads top-to-bottom like ordinary code:
+
+```javascript
+// .then() style
+function order() {
+  cookFood().then((food) => {
+    console.log("Got:", food);
+  });
+}
+
+// async/await style — identical behavior, different look
+async function order() {
+  const food = await cookFood();
+  console.log("Got:", food);
+}
+```
+
+If `.then()` already makes sense to you, `await` is the same idea with less punctuation.
+
 ---
 
 ## 27. The `async` Keyword
@@ -974,6 +1077,8 @@ async function test() {
 console.log(test()); // Promise {100}
 ```
 
+To actually get the value out, you must either `await` the call or chain `.then()` onto it — `async` doesn't remove the need to unwrap the Promise, it just changes how you write the code that produces it.
+
 **TypeScript** — declare the resolved type explicitly:
 
 ```typescript
@@ -983,6 +1088,66 @@ async function login(): Promise<string> {
 
 async function age(): Promise<number> {
   return 25;
+}
+```
+
+### `async` Functions in Different Forms
+
+`async` works on any function form, not just `function` declarations:
+
+```javascript
+// Arrow function
+const getUser = async () => {
+  return "John";
+};
+
+// Method inside an object/class
+const api = {
+  async fetchData() {
+    return "data";
+  },
+};
+
+// Immediately Invoked Async Function Expression (IIAFE)
+(async () => {
+  const result = await getUser();
+  console.log(result);
+})();
+```
+
+```typescript
+const getUser = async (): Promise<string> => {
+  return "John";
+};
+
+class Api {
+  async fetchData(): Promise<string> {
+    return "data";
+  }
+}
+```
+
+### Throwing Inside an `async` Function
+
+Just like inside `.then()`, a `throw` inside an `async` function automatically becomes a **rejected Promise** — you don't need to call `reject()` manually:
+
+```javascript
+async function checkAge(age) {
+  if (age < 18) {
+    throw new Error("Not allowed");
+  }
+  return "Allowed";
+}
+
+checkAge(15).catch((err) => console.log(err.message)); // "Not allowed"
+```
+
+```typescript
+async function checkAge(age: number): Promise<string> {
+  if (age < 18) {
+    throw new Error("Not allowed");
+  }
+  return "Allowed";
 }
 ```
 
@@ -1068,6 +1233,51 @@ const [user, orders, payment]: [User, Order[], Payment] = await Promise.all([
 
 **Rule of thumb:** use `Promise.all()` whenever the tasks are independent of each other — don't await them one-by-one unnecessarily.
 
+### `await` Works on Non-Promise Values Too
+
+If you `await` something that isn't a Promise, JavaScript just wraps it in `Promise.resolve(value)` and immediately continues — it doesn't throw an error:
+
+```javascript
+async function test() {
+  const value = await 5; // not a Promise, but perfectly valid
+  console.log(value); // 5
+}
+```
+
+### ⚠️ Common Pitfall: `await` Inside Loops
+
+Using `await` inside a `for` loop runs each iteration **sequentially**, even if the tasks don't depend on each other — a frequent performance mistake:
+
+```javascript
+// ❌ Slow — each request waits for the previous one (sequential)
+for (const id of userIds) {
+  const user = await getUser(id);
+  console.log(user);
+}
+
+// ✅ Fast — all requests fire together (parallel)
+const users = await Promise.all(userIds.map((id) => getUser(id)));
+users.forEach((user) => console.log(user));
+```
+
+Only use a sequential loop with `await` when each step genuinely depends on the previous one's result.
+
+### Top-Level `await`
+
+Modern JavaScript (ES modules) allows `await` directly at the top level of a module — no wrapping `async` function required:
+
+```javascript
+// inside a .mjs file or a <script type="module">
+const data = await fetch("/config.json").then((res) => res.json());
+console.log(data);
+```
+
+```typescript
+// top-level await requires "module": "ES2022"+ and "target": "ES2017"+
+// in tsconfig.json
+const data = await fetch("/config.json").then((res) => res.json());
+```
+
 ---
 
 ## 29. Error Handling with `async`/`await`
@@ -1106,33 +1316,130 @@ Start → try → Success?
    No  → catch() → handle error
 ```
 
+### You Can Also `.catch()` an `async` Function From Outside
+
+Since an `async` function always returns a Promise, callers can skip `try...catch` and use `.catch()` instead — both are valid, pick one style per situation:
+
+```javascript
+async function login() {
+  const user = await getUser(); // no local try...catch
+  console.log(user);
+}
+
+login().catch((error) => console.log("Login failed:", error));
+```
+
+### One `try...catch` Can Wrap Multiple `await` Calls
+
+```javascript
+async function checkout() {
+  try {
+    const user = await getUser();
+    const cart = await getCart(user);
+    const order = await placeOrder(cart);
+    console.log("Order placed:", order);
+  } catch (error) {
+    // catches a failure from ANY of the three awaited calls
+    console.log("Checkout failed:", error);
+  }
+}
+```
+
+```typescript
+async function checkout(): Promise<void> {
+  try {
+    const user: User = await getUser();
+    const cart: Cart = await getCart(user);
+    const order: Order = await placeOrder(cart);
+    console.log("Order placed:", order);
+  } catch (error) {
+    console.log("Checkout failed:", error);
+  }
+}
+```
+
+### Re-throwing After Handling
+
+Sometimes you want to log an error locally but still let the caller know something failed:
+
+```javascript
+async function getUser() {
+  try {
+    return await fetchUser();
+  } catch (error) {
+    console.log("Logged locally:", error);
+    throw error; // re-throw so the caller's catch also runs
+  }
+}
+```
+
 ---
 
 # JavaScript `Promise.withResolvers()`
 
 ## 30. Introduction to `Promise.withResolvers()`
 
-Before this modern addition, developers had to "smuggle" `resolve`/`reject` out of the Promise constructor manually:
+Before this modern addition, developers had to "smuggle" `resolve`/`reject` out of the Promise constructor manually, because the constructor only exposes them _inside_ the executor callback:
 
 ```javascript
 let resolveFunction;
+let rejectFunction;
 
-const promise = new Promise((resolve) => {
+const promise = new Promise((resolve, reject) => {
   resolveFunction = resolve;
+  rejectFunction = reject;
 });
 
+// now resolveFunction / rejectFunction can be called from anywhere else,
+// e.g. an event handler outside the Promise constructor
 resolveFunction("Done");
 ```
 
-Not very clean. `Promise.withResolvers()` gives you the Promise **and** its `resolve`/`reject` functions directly, without the awkward workaround:
+This works, but it's clunky — you need extra variables declared outside the Promise just to reach in and grab the settlers. `Promise.withResolvers()` (a newer static method, ES2024) gives you the Promise **and** its `resolve`/`reject` functions **directly and immediately**, side by side, with no workaround needed:
 
 ```javascript
 const { promise, resolve, reject } = Promise.withResolvers();
 ```
 
+> **Note:** This is a relatively new addition to JavaScript. Check current browser/Node/TypeScript-lib support if you're targeting older environments — `new Promise((resolve, reject) => {...})` is fully backward-compatible and remains the safe default.
+
+### The Doorbell Analogy
+
+Think of `Promise.withResolvers()` as **a box that comes with its own remote control**.
+
+Normally, a Promise settles itself from _inside_ its own constructor — `resolve`/`reject` only exist within that one callback. But sometimes you need to hand someone a Promise **right now**, and settle it **later**, from somewhere completely different in your code — like a doorbell that gets rung whenever a visitor shows up, not on a schedule you control.
+
+`Promise.withResolvers()` just pulls `resolve` and `reject` **out** of the constructor and hands them to you separately — like a TV and its remote sold together:
+
+```javascript
+const { promise, resolve, reject } = Promise.withResolvers();
+```
+
+- `promise` → give this to whoever is waiting
+- `resolve` / `reject` → keep these for yourself, press whenever you're ready
+
+**Doorbell example** — nobody knows exactly _when_ the button will be clicked, but the "waiting ticket" can be created and handed out immediately:
+
+```javascript
+function waitForDoorbell() {
+  const { promise, resolve } = Promise.withResolvers();
+
+  document.getElementById("bell").addEventListener("click", () => {
+    resolve("Ding dong!");
+  });
+
+  return promise; // handed out immediately, settled whenever the click happens
+}
+
+const doorbell = waitForDoorbell();
+doorbell.then((sound) => console.log(sound)); // logs "Ding dong!" whenever clicked
+```
+
 ---
 
 ## 31. `Promise.withResolvers()` Example
+
+### Basic Example
 
 ```javascript
 const { promise, resolve } = Promise.withResolvers();
@@ -1153,7 +1460,372 @@ promise.then((value: string) => console.log(value));
 resolve("Success"); // resolve() only accepts a string
 ```
 
-**When to use it:** event-driven code, custom libraries/frameworks, or any situation needing manual, external control over when a Promise settles. For typical application code, `new Promise(...)` is still the more common pattern.
+### Realistic Example — Resolving a Promise From an Event Handler
+
+This is where `withResolvers()` really shines: settling a Promise from **outside** its own creation point, such as in response to a button click or a socket message.
+
+```javascript
+function waitForUserConfirmation() {
+  const { promise, resolve, reject } = Promise.withResolvers();
+
+  document
+    .getElementById("confirmBtn")
+    .addEventListener("click", () => resolve("Confirmed"));
+
+  document
+    .getElementById("cancelBtn")
+    .addEventListener("click", () => reject("Cancelled"));
+
+  return promise;
+}
+
+// Elsewhere in the app:
+async function handleAction() {
+  try {
+    const result = await waitForUserConfirmation();
+    console.log(result); // "Confirmed"
+  } catch (error) {
+    console.log(error); // "Cancelled"
+  }
+}
+```
+
+```typescript
+function waitForUserConfirmation(): Promise<string> {
+  const { promise, resolve, reject } = Promise.withResolvers<string>();
+
+  document
+    .getElementById("confirmBtn")!
+    .addEventListener("click", () => resolve("Confirmed"));
+
+  document
+    .getElementById("cancelBtn")!
+    .addEventListener("click", () => reject("Cancelled"));
+
+  return promise;
+}
+```
+
+**When to use it:** event-driven code, custom libraries/frameworks, wrapping callback-based APIs, or any situation needing manual, external control over when a Promise settles — outside the scope of a single constructor call. For typical application code where you settle the Promise from inside the executor itself, `new Promise(...)` is still the simpler, more common pattern.
+
+---
+
+# Real-World Examples: Playwright
+
+Playwright is a great place to see every concept from this section in action, because almost every action (navigating, clicking, typing, waiting) takes real time and returns a Promise. Below, each topic is mapped to a genuine Playwright use case, in both JavaScript and TypeScript.
+
+## 1. Callbacks in Playwright
+
+Playwright still uses old-style callbacks for **event listeners** — you can't `await` an event, since you don't know when (or if) it'll fire, so you hand it a function to run whenever it happens.
+
+```javascript
+page.on("console", (msg) => {
+  console.log("Browser console:", msg.text());
+});
+
+page.on("response", (response) => {
+  if (response.status() >= 400) {
+    console.log("Failed request:", response.url());
+  }
+});
+```
+
+```typescript
+import { ConsoleMessage, Response } from "playwright";
+
+page.on("console", (msg: ConsoleMessage) => {
+  console.log("Browser console:", msg.text());
+});
+
+page.on("response", (response: Response) => {
+  if (response.status() >= 400) {
+    console.log("Failed request:", response.url());
+  }
+});
+```
+
+## 2. Understanding Promises — every Playwright action _is_ one
+
+```javascript
+const navigationPromise = page.goto("https://example.com");
+console.log(navigationPromise); // Promise { <pending> }
+```
+
+`page.goto()` doesn't return a loaded page — it returns a **Promise that resolves once navigation completes**. This is exactly the "pizza ticket" from earlier: you get a placeholder immediately, the real result comes later.
+
+## 3. Creating and Consuming a Promise — waiting for a custom condition
+
+Sometimes you need to wrap Playwright's polling logic yourself, using the raw Promise constructor:
+
+```javascript
+function waitForElementCount(page, selector, count) {
+  return new Promise((resolve, reject) => {
+    const interval = setInterval(async () => {
+      const items = await page.$$(selector);
+      if (items.length === count) {
+        clearInterval(interval);
+        resolve(items);
+      }
+    }, 200);
+
+    setTimeout(() => {
+      clearInterval(interval);
+      reject(new Error("Timed out waiting for element count"));
+    }, 5000);
+  });
+}
+
+waitForElementCount(page, ".product-card", 10)
+  .then((items) => console.log(`Found ${items.length} products`))
+  .catch((error) => console.log(error.message));
+```
+
+## 4. Promise Chaining — a sequence of dependent page actions
+
+```javascript
+page
+  .goto("https://example.com/login")
+  .then(() => page.fill("#username", "john"))
+  .then(() => page.fill("#password", "secret123"))
+  .then(() => page.click("#submit"))
+  .then(() => page.waitForSelector(".dashboard"))
+  .then(() => console.log("Logged in successfully"))
+  .catch((error) => console.log("Login flow failed:", error.message));
+```
+
+In practice, Playwright test code almost always uses `async`/`await` instead of `.then()` chains for exactly this scenario — same underlying mechanism, far more readable:
+
+```javascript
+async function login(page) {
+  await page.goto("https://example.com/login");
+  await page.fill("#username", "john");
+  await page.fill("#password", "secret123");
+  await page.click("#submit");
+  await page.waitForSelector(".dashboard");
+  console.log("Logged in successfully");
+}
+```
+
+## 5. `Promise.all()` — running independent steps in parallel
+
+**Filling independent fields together (faster):**
+
+```javascript
+await Promise.all([
+  page.fill("#firstName", "John"),
+  page.fill("#lastName", "Doe"),
+  page.fill("#email", "john@example.com"),
+]);
+```
+
+**The single most important `Promise.all()` pattern in Playwright — navigation races:** the click _triggers_ navigation almost instantly, so you must start "listening" for it in the same breath as clicking, not after:
+
+```javascript
+// ❌ Wrong — by the time waitForNavigation() runs, navigation may have already happened
+await page.click("#submit");
+await page.waitForNavigation();
+
+// ✅ Correct — both start together
+await Promise.all([page.waitForNavigation(), page.click("#submit")]);
+```
+
+```typescript
+await Promise.all<[void, void]>([
+  page.waitForNavigation(),
+  page.click("#submit"),
+]);
+```
+
+## 6. `Promise.race()` — enforcing a custom timeout
+
+```javascript
+async function clickWithTimeout(page, selector, ms) {
+  return Promise.race([
+    page.click(selector),
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error("Click timed out")), ms),
+    ),
+  ]);
+}
+
+clickWithTimeout(page, "#slow-button", 3000).catch((error) =>
+  console.log(error.message),
+);
+```
+
+```typescript
+async function clickWithTimeout(
+  page: Page,
+  selector: string,
+  ms: number,
+): Promise<void> {
+  return Promise.race([
+    page.click(selector),
+    new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error("Click timed out")), ms),
+    ),
+  ]);
+}
+```
+
+## 7. `Promise.any()` — trying multiple possible selectors, first one wins
+
+Useful when a page might show one of several possible UI variants (A/B test, different locales), and you just need whichever one shows up first:
+
+```javascript
+Promise.any([
+  page.waitForSelector("#cookie-banner-v1"),
+  page.waitForSelector("#cookie-banner-v2"),
+  page.waitForSelector(".gdpr-consent"),
+])
+  .then((el) => console.log("Found a consent banner variant"))
+  .catch(() => console.log("No consent banner appeared"));
+```
+
+## 8. `Promise.allSettled()` — running a full suite of checks without stopping early
+
+Great for validation steps where you want **every** result, even if some checks fail — e.g., checking multiple links on a page for broken responses:
+
+```javascript
+const links = ["/about", "/pricing", "/contact", "/broken-page"];
+
+const results = await Promise.allSettled(
+  links.map((path) => page.goto(`https://example.com${path}`)),
+);
+
+results.forEach((result, i) => {
+  if (result.status === "fulfilled") {
+    console.log(`${links[i]}: OK`);
+  } else {
+    console.log(`${links[i]}: FAILED — ${result.reason}`);
+  }
+});
+```
+
+## 9. `finally()` — always closing the browser, pass or fail
+
+```javascript
+const browser = await chromium.launch();
+
+try {
+  const page = await browser.newPage();
+  await page.goto("https://example.com");
+  await page.click("#maybe-missing-button");
+} catch (error) {
+  console.log("Test step failed:", error.message);
+} finally {
+  await browser.close(); // runs whether the test passed or failed
+}
+```
+
+## 10. Error Handling — missing `catch()` vs handled
+
+```javascript
+// ❌ Unhandled rejection — Playwright will crash the script with a stack trace
+page.click("#nonexistent-selector");
+
+// ✅ Handled — the failure is caught and logged, script continues
+try {
+  await page.click("#nonexistent-selector", { timeout: 3000 });
+} catch (error) {
+  console.log("Element not found:", error.message);
+}
+```
+
+## 11. Full `async`/`await` Example — a complete login test
+
+```javascript
+const { chromium } = require("playwright");
+
+async function runLoginTest() {
+  const browser = await chromium.launch();
+  const page = await browser.newPage();
+
+  try {
+    await page.goto("https://example.com/login");
+    await page.fill("#username", "john");
+    await page.fill("#password", "secret123");
+
+    await Promise.all([page.waitForNavigation(), page.click("#submit")]);
+
+    const heading = await page.textContent(".dashboard h1");
+    console.log("Dashboard heading:", heading);
+  } catch (error) {
+    console.log("Test failed:", error.message);
+  } finally {
+    await browser.close();
+  }
+}
+
+runLoginTest();
+```
+
+**TypeScript version** — fully typed end to end:
+
+```typescript
+import { chromium, Browser, Page } from "playwright";
+
+async function runLoginTest(): Promise<void> {
+  const browser: Browser = await chromium.launch();
+  const page: Page = await browser.newPage();
+
+  try {
+    await page.goto("https://example.com/login");
+    await page.fill("#username", "john");
+    await page.fill("#password", "secret123");
+
+    await Promise.all([page.waitForNavigation(), page.click("#submit")]);
+
+    const heading: string | null = await page.textContent(".dashboard h1");
+    console.log("Dashboard heading:", heading);
+  } catch (error) {
+    console.log("Test failed:", (error as Error).message);
+  } finally {
+    await browser.close();
+  }
+}
+
+runLoginTest();
+```
+
+## 12. `Promise.withResolvers()` — waiting for a page-triggered event (e.g., a `dialog`)
+
+This is the doorbell pattern in action: a `dialog` (browser alert/confirm popup) can appear at any unpredictable moment after some action, triggered by the page itself — you need a Promise that's created up front and settled later, from inside an event listener:
+
+```javascript
+function waitForDialogMessage(page) {
+  const { promise, resolve } = Promise.withResolvers();
+
+  page.once("dialog", async (dialog) => {
+    resolve(dialog.message()); // settle from inside the event handler
+    await dialog.accept();
+  });
+
+  return promise;
+}
+
+async function run() {
+  const dialogPromise = waitForDialogMessage(page); // created immediately
+  await page.click("#trigger-alert"); // fires the dialog at some point
+  const message = await dialogPromise; // settled whenever it appears
+  console.log("Alert said:", message);
+}
+```
+
+```typescript
+import { Page, Dialog } from "playwright";
+
+function waitForDialogMessage(page: Page): Promise<string> {
+  const { promise, resolve } = Promise.withResolvers<string>();
+
+  page.once("dialog", async (dialog: Dialog) => {
+    resolve(dialog.message());
+    await dialog.accept();
+  });
+
+  return promise;
+}
+```
 
 ---
 
