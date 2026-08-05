@@ -2,10 +2,6 @@
 
 ### (JavaScript + TypeScript — Complete Notes)
 
-> These notes cover every topic in your outline, with explanations and side-by-side JavaScript and TypeScript examples wherever the concept applies.
-
----
-
 ## Table of Contents
 
 **JavaScript Promises**
