@@ -187,5 +187,307 @@ createPair(10, 20); // allowed
 createPair(true, false); // Not allowed Because boolean isn't allowed
 ```
 
+---
+# TypeScript Utility Types
+
+> **Note:** Utility Types are **built-in TypeScript types** that help you **modify existing types** without rewriting them. They are commonly used in real-world applications such as APIs, forms, database models, and state management.
 
 ---
+
+## What are Utility Types?
+
+Instead of creating new interfaces for every scenario, Utility Types let you **reuse and transform existing types**.
+
+Without Utility Types:
+
+```ts
+interface User {
+  id: number;
+  name: string;
+  email: string;
+}
+```
+
+Need another interface for updates?
+
+```ts
+interface UpdateUser {
+  id?: number;
+  name?: string;
+  email?: string;
+}
+```
+
+❌ Duplicate code.
+
+With Utility Types:
+
+```ts
+type UpdateUser = Partial<User>;
+```
+
+✅ One line, reusable, and maintainable.
+
+## 1. `Partial<T>`
+
+Makes **all properties optional**.
+
+### Syntax
+
+```ts
+Partial<Type>;
+```
+
+### Example
+
+```ts
+interface User {
+  id: number;
+  name: string;
+  email: string;
+}
+
+const user: Partial<User> = {
+  name: "John",
+};
+```
+- Only `name` is provided.
+- `id` and `email` become optional.
+---
+## 2. `Required<T>`
+
+Makes **every property mandatory**, even optional ones.
+
+### Syntax
+
+```ts
+Required<Type>;
+```
+
+### Example
+
+```ts
+interface Car {
+  brand: string;
+  model: string;
+  mileage?: number;
+}
+
+const car: Required<Car> = {
+  brand: "BMW",
+  model: "X5",
+  mileage: 20000,
+};
+```
+Even though `mileage` was optional, it is now required.
+
+---
+## 3. `Readonly<T>`
+Prevents properties from being modified.
+
+### Syntax
+
+```ts
+Readonly<Type>;
+```
+
+### Example
+
+```ts
+interface User {
+  name: string;
+  age: number;
+}
+
+const user: Readonly<User> = {
+  name: "John",
+  age: 25,
+};
+
+// user.age = 30; ❌ Error
+```
+Once assigned, values cannot be changed.
+
+---
+## 4. `Record<K, V>`
+Creates an object with a **specific key type** and **value type**.
+
+### Syntax
+
+```ts
+Record<KeyType, ValueType>;
+```
+
+### Example
+
+```ts
+const marks: Record<string, number> = {
+  John: 95,
+  Alice: 90,
+  Bob: 88,
+};
+```
+
+Meaning
+
+```ts
+{
+    [key:string]:number;
+}
+```
+Every key is a string.
+Every value is a number.
+
+---
+## 5. `Pick<T, Keys>`
+Select **only specific properties**.
+
+### Syntax
+
+```ts
+Pick<Type, "key1" | "key2">;
+```
+
+### Example
+
+```ts
+interface User {
+  id: number;
+  name: string;
+  email: string;
+}
+
+type UserName = Pick<User, "name">;
+
+const user: UserName = {
+  name: "John",
+};
+```
+Only `name` exists.
+
+---
+## 6. `Omit<T, Keys>`
+Remove unwanted properties.
+
+### Syntax
+
+```ts
+Omit<Type, "key">;
+```
+
+### Example
+
+```ts
+interface User {
+  id: number;
+  password: string;
+  name: string;
+}
+
+type PublicUser = Omit<User, "password">;
+```
+
+Now
+
+```ts
+{
+  (id, name);
+}
+```
+Password is removed.
+
+---
+## 7. `Exclude<T, U>`
+
+Removes types from a **Union Type**.
+
+### Syntax
+
+```ts
+Exclude<Union, RemoveType>;
+```
+
+### Example
+
+```ts
+type Status = "Pending" | "Success" | "Failed";
+
+type NewStatus = Exclude<Status, "Failed">;
+```
+
+Now
+
+```ts
+Pending | Success;
+```
+
+---
+## 8. `ReturnType<T>`
+Gets the return type of a function.
+
+### Example
+
+```ts
+function getUser() {
+  return {
+    id: 1,
+    name: "John",
+  };
+}
+
+type User = ReturnType<typeof getUser>;
+```
+
+User becomes
+
+```ts
+{
+  id: number;
+  name: string;
+}
+```
+
+---
+## 9. `Parameters<T>`
+Gets the parameter types of a function.
+
+### Example
+
+```ts
+function login(username: string, password: string) {}
+
+type LoginParams = Parameters<typeof login>;
+```
+
+Result
+
+```ts
+[string, string];
+```
+
+Access first parameter
+
+```ts
+type Username = Parameters<typeof login>[0];
+```
+
+Result
+
+```ts
+string;
+```
+
+---
+# 🟨 Utility Types Comparison
+
+| Utility Type    | Purpose                          | Real-world Example              |
+| --------------- | -------------------------------- | ------------------------------- |
+| `Partial<T>`    | Make all properties optional     | Update APIs (PATCH), forms      |
+| `Required<T>`   | Make all properties required     | Database save, validation       |
+| `Readonly<T>`   | Prevent modifications            | Config objects, immutable state |
+| `Record<K,V>`   | Create key-value objects         | Maps, dictionaries, caches      |
+| `Pick<T,K>`     | Keep selected properties         | User profile, login response    |
+| `Omit<T,K>`     | Remove selected properties       | Hide passwords, internal fields |
+| `Exclude<T,U>`  | Remove types from a union        | Filter enum/union values        |
+| `ReturnType<T>` | Get a function's return type     | API/service responses           |
+| `Parameters<T>` | Get a function's parameter types | Wrappers, middleware            |
