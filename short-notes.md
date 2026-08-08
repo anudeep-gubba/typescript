@@ -157,3 +157,35 @@ class Box<T = string> {
 const box = new Box("Hello");
 ```
 Since no type is specified. T = string
+
+## 6. Generic Constraints (`extends`)
+
+Sometimes you want to **restrict** which types can be used. Use **`extends`**.
+
+### Example
+
+```ts
+function printLength<T extends { length: number }>(value: T) {
+  console.log(value.length);
+}
+
+printLength("Hello"); // Works
+printLength([1, 2, 3]); // Works
+printLength(100); // Doesn't work Because number has no length property
+```
+
+```ts
+function createPair<T extends string | number, U extends string | number>(
+  a: T,
+  b: U,
+) {
+  return [a, b];
+}
+
+createPair("John", 25); // allowed
+createPair(10, 20); // allowed
+createPair(true, false); // Not allowed Because boolean isn't allowed
+```
+
+
+---
