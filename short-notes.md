@@ -3,6 +3,7 @@
 ## Content
 - [Data Types](#data-types)
 - [Type Aliases & Interfaces](#type-aliases--interfaces)
+- [Operators](#operators)
 - [Type Casting](#type-casting-only-in-typescript)
 - [TypeScript – Generics](#typescript--generics)
 - [TypeScript Utility Types](#typescript-utility-types)
@@ -545,6 +546,148 @@ This produces the same result as extending an interface.
 ❌ Using `interface` for union types
 ❌ Forgetting to update types when object properties change.
 ❌ Creating overly complex nested types that reduce readability.
+
+# Operators
+
+1. **Assignment Operators:** Assign or update values.
+2. **Arithmetic Operators:** Perform mathematical operations.
+3. **String Concatenation (`+`):** Combine strings.
+4. **Comparison Operators:** Compare values and return boolean results.
+5. **Logical Operators:** Combine multiple conditions.
+6. **Spread Operator (`...`):** Expand elements of an array or object.
+7. **Falsy Values:** Values that evaluate to `false`.
+8. **Truthy Values:** Values that evaluate to `true`.
+
+```ts
+// ==========================================
+// 1. Assignment Operators
+// ==========================================
+
+let x = 10;
+x += 5; // Equivalent to x = x + 5; → 15
+
+
+// ==========================================
+// 2. Arithmetic Operators
+// ==========================================
+
+let a = 20;
+let b = 5;
+
+let sum = a + b;                 // 25
+let difference = a - b;          // 15
+let product = a * b;             // 100
+let quotient = a / b;            // 4
+let remainder = a % b;           // 0
+let exponentiation = a ** b;     // 3200000
+
+let preIncrement = ++a;          // a = 21
+let preDecrement = --b;          // b = 4
+let postIncrement = a++;         // returns 21, then a = 22
+let postDecrement = b--;         // returns 4, then b = 3
+
+console.log(
+  `Sum: ${sum}, Difference: ${difference}, Product: ${product}, Quotient: ${quotient}, Remainder: ${remainder}`
+);
+
+
+// ==========================================
+// 3. String Concatenation (+)
+// ==========================================
+
+let firstName = "John";
+let lastName = "Doe";
+
+let fullName = firstName + " " + lastName;
+
+console.log(`Full Name: ${fullName}`);
+
+// number + string results in string concatenation
+let age = 30;
+let message = "Age: " + age;
+
+console.log(message); // Age: 30
+
+
+// ==========================================
+// 4. Comparison Operators
+// ==========================================
+
+let num1 = 10;
+let num2 = 20;
+
+console.log(num1 == num2);     // false - equality
+console.log(num1 === num2);    // false - strict equality
+console.log(num1 != num2);     // true - inequality
+console.log(num1 !== num2);    // true - strict inequality
+console.log(num1 < num2);      // true
+console.log(num1 > num2);      // false
+console.log(num1 <= num2);     // true
+console.log(num1 >= num2);     // false
+
+
+// ==========================================
+// 5. Logical Operators
+// ==========================================
+
+let isAdult = true;
+let hasPermission = false;
+
+console.log(isAdult && hasPermission); // false - AND
+console.log(isAdult || hasPermission); // true - OR
+console.log(!isAdult);                 // false - NOT
+
+
+// ==========================================
+// 6. Spread Operator (...)
+// ==========================================
+
+let arr1 = [1, 2, 3];
+let arr2 = [4, 5, 6];
+
+let combinedArray = [...arr1, ...arr2];
+
+console.log(combinedArray); // [1, 2, 3, 4, 5, 6]
+
+
+// ==========================================
+// 7. Falsy Values
+// ==========================================
+
+let falsyValues = [
+  false,
+  0,
+  -0,
+  0n,
+  "",
+  null,
+  undefined,
+  NaN
+];
+
+falsyValues.forEach((value) => {
+  console.log(`Value: ${value}, is falsy: ${!value}`);
+});
+
+
+// ==========================================
+// 8. Truthy Values
+// ==========================================
+
+let truthyValues = [
+  true,
+  1,
+  -1,
+  "non-empty string",
+  {},
+  [],
+  function () {}
+];
+
+truthyValues.forEach((value) => {
+  console.log(`Value: ${value}, is truthy: ${!!value}`);
+});
+```
 
 # Type Casting (only in Typescript)
 -----
