@@ -1,5 +1,10 @@
 # Javascript & Typescript - Short Notes
 
+## Content
+- [Data Types](data-types)
+- [Type Aliases & Interfaces](type-aliases--interfaces)
+- 
+
 # Data Types
 A data type is a classification that specifies what kind of value a variable can store.
 
@@ -32,7 +37,7 @@ Data Types
     └── Object Literals (TypeScript)
 ```
 
-**Primitive data types:** Primitive types store a single value and are immutable.
+### **Primitive data types:** Primitive types store a single value and are immutable.
 
 1. **Number** — Represents integers and floating-point numbers.
 2. **String** — Represents text.
@@ -78,7 +83,7 @@ console.log(bigNumber);
 
 ```
 
-# Non-Primitive / Reference Data Types
+### Non-Primitive / Reference Data Types
 
 **Non-primitive (reference) types** can represent complex data structures and may contain multiple values. Unlike primitive values, objects, arrays, and functions are generally **mutable** and are handled through references.
 
@@ -332,6 +337,20 @@ const employee: Employee = {
 
 console.log(employee);
 ```
+# Type Aliases & Interfaces
+
+TypeScript allows you to create **reusable custom types** so you don't have to repeat the same type definitions throughout your code.
+
+The two main ways to create reusable types are:
+
+- **Type Aliases (`type`)**
+- **Interfaces (`interface`)**
+
+Both improve **code readability**, **maintainability**, and **reusability**.
+**Type Aliases (`type`)**: A **Type Alias** creates a custom name (alias) for an existing type.
+It can represent: Primitive types, Object types, Arrays, Functions, Union types,Intersection types
+
+**Syntax**: ``` type AliasName = Type;```
 
 
 # Type Casting (only in Typescript)
