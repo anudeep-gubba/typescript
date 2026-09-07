@@ -78,6 +78,261 @@ console.log(bigNumber);
 
 ```
 
+# Non-Primitive / Reference Data Types
+
+**Non-primitive (reference) types** can represent complex data structures and may contain multiple values. Unlike primitive values, objects, arrays, and functions are generally **mutable** and are handled through references.
+
+> **Important:** `Tuple`, `Enum`, `Any`, `Unknown`, and `Never` are **TypeScript type-system features**, not JavaScript reference data types. They are included here because they are commonly learned alongside TypeScript data types.
+
+---
+1. **Object:** An **object** is a collection of key-value pairs. Keys are usually strings or symbols, and values can have different types.
+
+2. **Array:** An **array** is an ordered collection of values. The elements can be of the same type or, depending on the type definition, multiple types.
+
+3. **Tuple — TypeScript Only:** A **tuple** is an array with fixed length, fixed order, fixed types at each position. JavaScript does not have a native tuple type. TypeScript enforces tuples at compile time.
+
+4. **Function:** Functions are **first-class values** in JavaScript and TypeScript. They can be assigned to variables, passed as arguments, returned from other functions, stored in objects or arrays. TypeScript allows you to specify parameter types and return types.
+
+5. **Enum — TypeScript:** An **enum** defines a group of named constants. Enums can be numeric or string-based.
+
+6. **Any — TypeScript:** The `any` type allows a variable to hold **any type of value**. It effectively disables TypeScript's type checking for that value, so it should generally be avoided unless necessary.
+
+7. **Unknown — TypeScript:** The `unknown` type can hold a value of any type, but it is **safer than `any`**. You must perform type checking before using the value.
+
+8. **Never — TypeScript:** The `never` type represents a value that **never occurs**. It is commonly used for functions that always throw an error, never finish execution, or represent unreachable code paths.
+
+9. **Object Literals:** An **object literal** is an object created directly using `{}`. TypeScript allows you to define its structure using inline object types, `type` aliases, or `interface`. For larger applications, `interface` or `type` aliases are generally preferred because they make types reusable.
+
+```ts
+// ==========================================
+// NON-PRIMITIVE / REFERENCE DATA TYPES
+// ==========================================
+
+// 1. Object
+interface Person {
+  name: string;
+  age: number;
+}
+
+const person: Person = {
+  name: "Alice",
+  age: 30,
+};
+
+console.log(person.name);
+console.log(person.age);
+
+
+// ==========================================
+// 2. Array
+// ==========================================
+
+// Using type[]
+const numbers: number[] = [1, 2, 3, 4, 5];
+
+console.log(numbers[0]);       // First element
+console.log(numbers.length);   // Length of array
+
+
+// Using generic Array<T>
+const strings: Array<string> = ["Hello", "World"];
+
+console.log(strings[1]);       // World
+
+
+// Array with multiple types
+const mixed: (string | number)[] = ["Alice", 30, "Bob", 25];
+
+console.log(mixed);
+
+
+// ==========================================
+// 3. Tuple
+// TypeScript Only
+// ==========================================
+
+// Fixed length, fixed order and fixed types
+const tuple: [string, number, boolean] = ["Alice", 30, true];
+
+console.log(tuple[0]); // string
+console.log(tuple[1]); // number
+console.log(tuple[2]); // boolean
+
+
+// ==========================================
+// 4. Function
+// ==========================================
+
+// Function declaration
+function add(a: number, b: number): number {
+  return a + b;
+}
+
+// Arrow function
+const multiply = (a: number, b: number): number => {
+  return a * b;
+};
+
+console.log(add(2, 3));       // 5
+console.log(multiply(4, 5));  // 20
+
+
+// Function stored in a variable
+const greet = (name: string): string => {
+  return `Hello ${name}`;
+};
+
+console.log(greet("Alice"));
+
+
+// ==========================================
+// 5. Enum
+// TypeScript Only
+// ==========================================
+
+enum Color {
+  Red,
+  Green,
+  Blue,
+}
+
+const favoriteColor: Color = Color.Green;
+
+console.log(favoriteColor); // 1
+
+
+// String enum
+enum Status {
+  Success = "SUCCESS",
+  Failed = "FAILED",
+  Pending = "PENDING",
+}
+
+const currentStatus: Status = Status.Success;
+
+console.log(currentStatus); // SUCCESS
+
+
+// ==========================================
+// 6. Any
+// TypeScript Only
+// ==========================================
+
+// any disables type checking
+let randomValue: any = 10;
+
+console.log(randomValue); // 10
+
+randomValue = "Hello";
+console.log(randomValue); // Hello
+
+randomValue = true;
+console.log(randomValue); // true
+
+// TypeScript allows this with any,
+// even though it may cause a runtime error.
+// randomValue.toUpperCase();
+
+
+// ==========================================
+// 7. Unknown
+// TypeScript Only
+// ==========================================
+
+let unknownValue: unknown = 10;
+
+console.log(unknownValue); // 10
+
+unknownValue = "Hello";
+
+console.log(unknownValue); // Hello
+
+unknownValue = true;
+
+console.log(unknownValue); // true
+
+
+// Must check the type before performing
+// type-specific operations
+if (typeof unknownValue === "string") {
+  console.log(unknownValue.toUpperCase());
+} else {
+  console.log("unknownValue is not a string");
+}
+
+
+// ==========================================
+// 8. Never
+// TypeScript Only
+// ==========================================
+
+// Function that always throws an error
+function throwError(message: string): never {
+  throw new Error(message);
+}
+
+// Function that never finishes
+function infiniteLoop(): never {
+  while (true) {
+    // Infinite loop
+  }
+}
+
+
+// ==========================================
+// 9. Object Literal
+// ==========================================
+
+// Inline object type
+const car: {
+  make: string;
+  model: string;
+  year: number;
+} = {
+  make: "Toyota",
+  model: "Camry",
+  year: 2020,
+};
+
+console.log(car.make);
+console.log(car.model);
+console.log(car.year);
+
+
+// ==========================================
+// Object Literal using type alias
+// ==========================================
+
+type User = {
+  name: string;
+  age: number;
+};
+
+const user1: User = {
+  name: "Alice",
+  age: 30,
+};
+
+console.log(user1);
+
+
+// ==========================================
+// Object Literal using interface
+// ==========================================
+
+interface Employee {
+  name: string;
+  age: number;
+}
+
+const employee: Employee = {
+  name: "Alice",
+  age: 30,
+};
+
+console.log(employee);
+```
+
 
 # Type Casting (only in Typescript)
 -----
