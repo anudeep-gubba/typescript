@@ -1,8 +1,8 @@
 # Javascript & Typescript - Short Notes
 
 ## Content
-- [Data Types](data-types)
-- [Type Aliases & Interfaces](type-aliases--interfaces)
+- [Data Types](#data-types)
+- [Type Aliases & Interfaces](#type-aliases--interfaces)
 - 
 
 # Data Types
