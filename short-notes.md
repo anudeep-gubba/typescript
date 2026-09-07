@@ -352,6 +352,85 @@ It can represent: Primitive types, Object types, Arrays, Functions, Union types,
 
 **Syntax**: ``` type AliasName = Type;```
 
+```
+// ==========================================
+// 1. Primitive Type Alias
+// ==========================================
+
+type UserName = string;
+
+type Age = number;
+
+let empName: UserName = "John";
+
+let age: Age = 25;
+
+// ==========================================
+// 2. Object Type Alias
+// ==========================================
+
+type Car = {
+  brand: string;
+  model: string;
+  year: number;
+};
+
+const car: Car = {
+  brand: "Toyota",
+  model: "Corolla",
+  year: 2024,
+};
+
+// ==========================================
+// 3. Array Type Alias
+// ==========================================
+
+type Numbers = number[];
+
+const scores: Numbers = [90, 95, 100];
+
+// ==========================================
+// 4. Function Type Alias
+// ==========================================
+
+type Add = (a: number, b: number) => number;
+
+const add: Add = (a, b) => a + b;
+```
+**5. Union Types**: A **Union Type (`|`)** allows a variable to store **one of multiple types**.
+
+**Syntax:**
+```ts
+type Status = "success" | "error";
+```
+**Example:**
+
+```ts
+type Status = "success" | "error";
+
+let response: Status = "success";
+
+response = "error"; // ✅
+
+response = "loading"; // ❌ Error
+```
+**6. Intersection Types**: An **Intersection Type (`&`)** combines multiple types into one.
+
+Example:
+```ts
+type Animal = {
+  name: string;
+};
+
+type Bear = Animal & {
+  honey: boolean;
+};
+
+const bear: Bear = {
+  name: "Winnie",
+  honey: true,
+};
+```
 
 # Type Casting (only in Typescript)
 -----
