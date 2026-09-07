@@ -4,6 +4,7 @@
 - [Data Types](#data-types)
 - [Type Aliases & Interfaces](#type-aliases--interfaces)
 - [Operators](#operators)
+- [Conditional Statements in TypeScript](#conditional-statements-in-typescript)
 - [Type Casting](#type-casting-only-in-typescript)
 - [TypeScript – Generics](#typescript--generics)
 - [TypeScript Utility Types](#typescript-utility-types)
@@ -687,6 +688,115 @@ let truthyValues = [
 truthyValues.forEach((value) => {
   console.log(`Value: ${value}, is truthy: ${!!value}`);
 });
+```
+
+# Conditional Statements in TypeScript
+
+1. **`if` statement:** Executes a block of code when a condition is `true`.
+2. **`if-else` statement:** Executes one block when the condition is `true`, otherwise another block.
+3. **`if-else if-else` statement:** Checks multiple conditions in sequence.
+4. **`switch` statement:** Executes code based on matching a value against multiple `case` options.
+5. **`break` statement:** Immediately exits a loop or `switch` statement.
+6. **Nullish Coalescing (`??`):** Returns the right-hand value when the left-hand value is `null` or `undefined`.
+
+```ts
+// ==========================================
+// 1. if Statement
+// ==========================================
+
+let age: number = 20;
+
+if (age >= 18) {
+  console.log("You are eligible to vote.");
+}
+
+
+// ==========================================
+// 2. if-else Statement
+// ==========================================
+
+let number: number = 10;
+
+if (number % 2 === 0) {
+  console.log("The number is even.");
+} else {
+  console.log("The number is odd.");
+}
+
+
+// ==========================================
+// 3. if-else if-else Statement
+// ==========================================
+
+let marks: number = 85;
+
+if (marks >= 90) {
+  console.log("Grade: A");
+} else if (marks >= 80) {
+  console.log("Grade: B");
+} else if (marks >= 70) {
+  console.log("Grade: C");
+} else {
+  console.log("Grade: D");
+}
+
+
+// ==========================================
+// 4. switch Statement
+// ==========================================
+
+let day: string = "Monday";
+
+switch (day) {
+  case "Monday":
+    console.log("Today is Monday.");
+    break;
+  case "Tuesday":
+    console.log("Today is Tuesday.");
+    break;
+  case "Wednesday":
+    console.log("Today is Wednesday.");
+    break;
+  case "Thursday":
+    console.log("Today is Thursday.");
+    break;
+  case "Friday":
+    console.log("Today is Friday.");
+    break;
+  case "Saturday":
+    console.log("Today is Saturday.");
+    break;
+  case "Sunday":
+    console.log("Today is Sunday.");
+    break;
+  default:
+    console.log("Invalid day.");
+}
+
+
+// ==========================================
+// 5. break Statement
+// ==========================================
+
+for (let i = 1; i <= 10; i++) {
+  if (i === 5) {
+    break; // Exit the loop when i is 5
+  }
+
+  console.log(i);
+}
+
+
+// ==========================================
+// 6. Nullish Coalescing (??)
+// ==========================================
+
+let userInput: string | null = null;
+let defaultValue: string = "Default Value";
+
+let result: string = userInput ?? defaultValue;
+
+console.log(result); // Default Value
 ```
 
 # Type Casting (only in Typescript)
