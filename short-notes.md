@@ -3,7 +3,9 @@
 ## Content
 - [Data Types](#data-types)
 - [Type Aliases & Interfaces](#type-aliases--interfaces)
-- 
+- [Type Casting](#type-casting-only-in-typescript)
+- [TypeScript – Generics](#typescript--generics)
+- [TypeScript Utility Types](#typescript-utility-types)
 
 # Data Types
 A data type is a classification that specifies what kind of value a variable can store.
@@ -431,6 +433,118 @@ const bear: Bear = {
   honey: true,
 };
 ```
+# Interfaces
+
+An **Interface** defines the structure (shape) of an object.
+
+Unlike `type`, interfaces are intended specifically for **objects**.
+
+## Syntax
+
+```ts
+interface InterfaceName {}
+```
+
+## Example
+
+```ts
+interface Rectangle {
+  height: number;
+  width: number;
+}
+
+const rectangle: Rectangle = {
+  height: 20,
+  width: 10,
+};
+```
+Missing required properties will produce a compile-time error.
+
+**Extending Interfaces**: Interfaces can inherit properties from another interface using `extends`.
+## Example
+
+```ts
+interface Rectangle {
+  height: number;
+  width: number;
+}
+
+interface ColoredRectangle extends Rectangle {
+  color: string;
+}
+
+const box: ColoredRectangle = {
+  height: 100,
+  width: 50,
+  color: "Red",
+};
+```
+**Interface Merging**:A unique feature of interfaces is **Declaration Merging**. Multiple interfaces with the same name are automatically combined.
+```ts
+interface Animal {
+  name: string;
+}
+
+interface Animal {
+  age: number;
+}
+
+const dog: Animal = {
+  name: "Rocky",
+  age: 5,
+};
+```
+
+TypeScript merges both interfaces into one.
+
+**Extending Type Aliases**: Type aliases don't use `extends`, but can achieve similar behavior with **intersection types (`&`)**.
+
+```ts
+type Rectangle = {
+  height: number;
+  width: number;
+};
+
+type ColoredRectangle = Rectangle & {
+  color: string;
+};
+```
+
+This produces the same result as extending an interface.
+
+## When to Use `interface`
+
+- Defining object shapes
+- API request/response models
+- Class contracts
+- Large projects
+- Declaration merging
+
+---
+
+## When to Use `type`
+
+- Primitive aliases
+- Arrays
+- Functions
+- Union types
+- Intersection types
+- Complex reusable types
+
+---
+
+## Best Practices
+
+- ✅ Use **`interface`** for object definitions and public APIs.
+- ✅ Use **`type`** for primitives, unions, intersections, arrays, and function types.
+- ✅ Keep types small and reusable.
+- ✅ Use meaningful names for custom types.
+- ✅ Prefer composition (combining types) over deeply nested inheritance.
+
+## Common Pitfalls
+❌ Using `interface` for union types
+❌ Forgetting to update types when object properties change.
+❌ Creating overly complex nested types that reduce readability.
 
 # Type Casting (only in Typescript)
 -----
