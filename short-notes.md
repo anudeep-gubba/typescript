@@ -5,6 +5,7 @@
 - [Type Aliases & Interfaces](#type-aliases--interfaces)
 - [Operators](#operators)
 - [Conditional Statements in TypeScript](#conditional-statements-in-typescript)
+- [Loops and Control Flow in TypeScript](#loops-and-control-flow-in-typescript)
 - [Type Casting](#type-casting-only-in-typescript)
 - [TypeScript – Generics](#typescript--generics)
 - [TypeScript Utility Types](#typescript-utility-types)
@@ -797,6 +798,119 @@ let defaultValue: string = "Default Value";
 let result: string = userInput ?? defaultValue;
 
 console.log(result); // Default Value
+```
+# Loops and Control Flow in TypeScript
+
+1. **`for` loop:** Repeats code for a known number of iterations.
+2. **`while` loop:** Repeats code while a condition is `true`.
+3. **`do...while` loop:** Executes the code at least once, then repeats while the condition is `true`.
+4. **`for...of` loop:** Iterates over the **values** of an iterable such as an array or string.
+5. **`for...in` loop:** Iterates over the **keys/properties** of an object.
+6. **`forEach` loop:** Executes a function for each element of an array.
+
+```ts id="p7q3kx"
+// ==========================================
+// 1. for Loop
+// ==========================================
+
+// Syntax:
+// for (initialization; condition; increment) {
+//   // code
+// }
+
+for (let i: number = 0; i < 5; i++) {
+  console.log(i);
+}
+
+
+// ==========================================
+// 2. while Loop
+// ==========================================
+
+// Syntax:
+// while (condition) {
+//   // code
+// }
+
+let j: number = 0;
+
+while (j < 5) {
+  console.log(j);
+  j++;
+}
+
+
+// ==========================================
+// 3. do...while Loop
+// ==========================================
+
+// Syntax:
+// do {
+//   // code
+// } while (condition);
+
+let k: number = 0;
+
+do {
+  console.log(k);
+  k++;
+} while (k < 5);
+
+
+// ==========================================
+// 4. for...of Loop
+// ==========================================
+
+// Iterates over values of an iterable
+
+// Syntax:
+// for (const element of iterable) {
+//   // code
+// }
+
+const array: number[] = [1, 2, 3, 4, 5];
+
+for (const num of array) {
+  console.log(num);
+}
+
+
+// ==========================================
+// 5. for...in Loop
+// ==========================================
+
+// Iterates over keys/properties of an object
+
+// Syntax:
+// for (const key in object) {
+//   // code
+// }
+
+const obj: { [key: string]: number } = {
+  a: 1,
+  b: 2,
+  c: 3
+};
+
+for (const key in obj) {
+  console.log(key, obj[key]);
+}
+
+
+// ==========================================
+// 6. forEach
+// ==========================================
+
+// Executes a function for each array element
+
+// Syntax:
+// array.forEach((element) => {
+//   // code
+// });
+
+array.forEach((num: number) => {
+  console.log(num);
+});
 ```
 
 # Type Casting (only in Typescript)
