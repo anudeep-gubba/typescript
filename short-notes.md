@@ -1,6 +1,36 @@
 # Javascript & Typescript - Short Notes
 
 # Data Types
+A data type is a classification that specifies what kind of value a variable can store.
+
+Data types are broadly classified into **two categories**:
+
+1. **Primitive Data Types**
+2. **Non-Primitive (Reference) Data Types**
+
+```
+Data Types
+│
+├── Primitive
+│   ├── Number
+│   ├── String
+│   ├── Boolean
+│   ├── Null
+│   ├── Undefined
+│   ├── Symbol
+│   └── BigInt
+│
+└── Non-Primitive
+    ├── Object
+    ├── Array
+    ├── Function
+    ├── Tuple (TypeScript)
+    ├── Enum (TypeScript)
+    ├── Any (TypeScript)
+    ├── Unknown (TypeScript)
+    ├── Never (TypeScript)
+    └── Object Literals (TypeScript)
+```
 
 **Primitive data types:** Primitive types store a single value and are immutable.
 
