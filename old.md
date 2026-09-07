@@ -1450,6 +1450,14 @@ const person: object = {
   name: "Alice",
   age: 30,
 };
+
+// TypeScript
+// Note: `object` only means "a non-primitive value" — it doesn't
+// describe which properties exist, so TypeScript will error on
+// person.name / person.age below ("Property does not exist on type 'object'").
+// Use an interface/type (or just let TS infer) if you need property access.
+console.log(person.name); // ❌ Property 'name' does not exist on type 'object'
+console.log(person.age);  // ❌ Property 'age' does not exist on type 'object'
 ```
 
 ---
