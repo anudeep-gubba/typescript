@@ -1,5 +1,53 @@
 # Javascript & Typescript - Short Notes
 
+# Data Types
+
+**Primitive data types:** Primitive types store a single value and are immutable.
+
+1. **Number** — Represents integers and floating-point numbers.
+2. **String** — Represents text.
+3. **Boolean** — Represents logical values.
+4. **Null** — Represents the intentional absence of a value.
+5. **Undefined** — Represents a variable that has been declared but not assigned a value.
+6. **Symbol** — Represents a unique and immutable identifier.
+7. **BigInt** — Used for integers larger than JavaScript's safe integer limit.
+
+```ts
+// 1. Number
+let age: number = 10;
+let price: number = 10.99;
+
+// 2. String
+let firstName: string = 'Anudeep';
+let lastName: string = 'G';
+console.log(`Full Name ${firstName} ${lastName}`);
+
+// 3. Boolean
+let isLoggedIn: boolean = true;
+
+// 4. Null
+let user: null = null;
+// More commonly
+let username: string | null = null;
+console.log(username);
+
+// 5. Undefined
+let city: undefined = undefined;
+// Or
+let cityName: string | undefined;
+console.log(city);
+console.log(cityName);
+
+// 6. Symbol
+const id: symbol = Symbol('user');
+console.log(id);
+
+// 7. BigInt
+const bigNumber: bigint = 12345678901234567890n;
+console.log(bigNumber);
+
+```
+
 
 # Type Casting (only in Typescript)
 -----
